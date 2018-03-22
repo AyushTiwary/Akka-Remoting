@@ -1,16 +1,15 @@
 package com.knoldus.akka.local
 
-import java.io.File
-
 import akka.actor.{Actor, ActorSystem, Props}
-import com.typesafe.config.ConfigFactory
+import com.knoldus.akka.CreateRemoteConfig
 
 class LocalActor extends Actor {
 
   var counter = 0
 
   override def preStart(): Unit = {
-    val remote = context.actorSelection("akka.tcp://RemoteSystem@127.0.0.1:5150/user/remote")
+    val remote = context.actorSelection("akka.tcp://RemoteSystem@127.0.0.1:5152/user/remote")
+    println("remote ::: " + remote)
     remote ! "Message from the LocalActor"
   }
 
@@ -27,8 +26,8 @@ class LocalActor extends Actor {
 }
 
 object LocalActor extends App {
-  val configFile = getClass.getClassLoader.getResource("local_application.conf").getFile
-  val config = ConfigFactory.parseFile(new File(configFile))
+  val createRemoteConfig = new CreateRemoteConfig
+  val config = createRemoteConfig.remoteConfig("127.0.0.1", 5151)
   val system = ActorSystem("ClientSystem", config)
   val localActor = system.actorOf(Props[LocalActor], name = "local")
 }

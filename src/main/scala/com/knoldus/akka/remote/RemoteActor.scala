@@ -1,9 +1,7 @@
 package com.knoldus.akka.remote
 
-import java.io.File
-
 import akka.actor._
-import com.typesafe.config.ConfigFactory
+import com.knoldus.akka.CreateRemoteConfig
 
 class RemoteActor extends Actor {
   override def receive: Receive = {
@@ -19,11 +17,9 @@ class RemoteActor extends Actor {
 }
 
 object RemoteActor extends App {
-  val configFile = getClass.getClassLoader.getResource("remote_application.conf").getFile
-  val config = ConfigFactory.parseFile(new File(configFile))
+  val createRemoteConfig = new CreateRemoteConfig
+  val config = createRemoteConfig.remoteConfig("127.0.0.1", 5152)
   val system = ActorSystem("RemoteSystem", config)
   val remote = system.actorOf(Props[RemoteActor], name = "remote")
   remote ! "START"
 }
-
-
